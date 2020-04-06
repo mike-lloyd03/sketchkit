@@ -1,26 +1,25 @@
 import React from 'react';
-import logo from './logo.svg';
+import SVG from './shape-components/SVG.js'
+import Tool from './interface-components/Tool.js'
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn Reacto
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {  };
+  }
+  render() {
+    let toolList = ['Select', 'Vertex', 'Line', 'Corner Rectangle', 'Center Rectangle', 'Clear']
+    toolList = toolList.map(a => <Tool key={`button${a}`} type={a} class='button' />)
+    return (
+      <div>
+        <div>
+          {toolList}
+        </div>
+        <SVG width='800' height='400' />      
+      </div>
+    );
+  }
 }
 
 export default App;
