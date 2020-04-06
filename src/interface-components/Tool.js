@@ -22,15 +22,16 @@ class Tool extends React.Component {
   //   console.log("activeTool=" + activeTool)
   // })
 
-clickHandler(event) {
-    console.log('button click ' + this.props.type)
+clickHandler() {
+    this.props.activeTool(this.props.type)
   }
+
 render() {
   return (
     <button
       id={this.props.type}
       value={this.props.type}
-      className={this.props.class}
+      className={this.props.className + (this.props.on ? " on" : '')}
       onClick={this.clickHandler}
     >
       {this.props.type}
