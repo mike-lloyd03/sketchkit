@@ -2,6 +2,7 @@ import React from 'react';
 import SVG from './shape-components/SVG.js'
 import Tool from './interface-components/Tool.js'
 import Vertex from './shape-components/Vertex.js'
+import Line from './shape-components/Line.js'
 import './App.css';
 
 class App extends React.Component {
@@ -10,15 +11,20 @@ class App extends React.Component {
     this.state = { 
       activeTool: '',
       elements: [],
+      activeElementKey: '',
+      mouseMoveListener: false,
      };
     this.activeTool = this.activeTool.bind(this)
     this.svgClick = this.svgClick.bind(this)
-
+    this.svgMouseMove = this.svgMouseMove.bind(this)
   }
 
   activeTool(tool) {
     if (tool !== 'Clear') {
       this.setState({activeTool: tool})
+    }
+    else if (tool === 'Clear') {
+      this.setState({elements: []})
     }
   }
 
@@ -26,15 +32,20 @@ class App extends React.Component {
     const eventX = event.nativeEvent.offsetX
     const eventY = event.nativeEvent.offsetY
     this.setState(state => {
+      let vertCount = state.elements.filter(a => a.type.name === 'Vertex').length
+      let lineCount = state.elements.filter(a => a.type.name === 'Line').length
+      // state.elements.map(a => console.log(a.type.name))
       switch(this.state.activeTool) {
         // case selectTool:
         //   selectElement(event)
         //   break
         case 'Vertex':
-          return {elements: [...state.elements, {type: 'Vertex', x: eventX, y: eventY}]}
-        // case lineTool:
-        //   newLine(event, s)
-        //   break
+          return {elements: [...state.elements, <Vertex key={`vertex${vertCount+1}`} x={eventX} y={eventY} />]}
+        case 'Line':
+          return {
+            mouseMoveListener: true,
+            elements: [...state.elements, <Line key={`line${lineCount+1}`} x1={eventX} y1={eventY} />]
+            }
         // case cornerRectTool:
         //   newRect(event, s, 'corner')
         //   break
@@ -45,6 +56,11 @@ class App extends React.Component {
           break
       }
     })
+    console.log(this.state)
+  }
+
+  svgMouseMove(event) {
+    console.log(event.nativeEvent.offsetX, event.nativeEvent.offsetY)
   }
 
   render() {
@@ -52,7 +68,7 @@ class App extends React.Component {
     const toolList = ['Select', 'Vertex', 'Line', 'Corner Rectangle', 'Center Rectangle', 'Clear']
     let toolComponents = toolList.map(a =>
       <Tool
-        key={`button${a}`}
+        key={`button${a.split(' ').join('')}`}
         type={a}
         className='button'
         on={a === this.state.activeTool}
@@ -60,15 +76,13 @@ class App extends React.Component {
       />
     )
 
-    let elementComponents = this.state.elements.map((a, i) => <Vertex key={`vertex${i}`} x={a.x} y={a.y} />)
-
     return (
       <div>
         <div>
           {toolComponents}
         </div>
-        <SVG width='800' height='400' handleClick={this.svgClick}>
-          {elementComponents}
+        <SVG width='800' height='400' handleClick={this.svgClick} handleMouseMove={this.state.handleMouseMove ? this.svgMouseMove : null}>
+          {this.state.elements}
         </SVG>      
       </div>
     );
