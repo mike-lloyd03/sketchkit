@@ -13,7 +13,11 @@ class Line extends Component {
   }
 
 componentDidMount() {
-  $('#svg').click($('svg').off('mousemove'))
+  $('#svg').click(event => {
+    event.stopPropagation()
+    $('svg').off('mousemove')
+    $('svg').off('click')
+  })
   $('body').keydown(event => console.log(event.key))
   $('#svg').mousemove(event => {
     this.setState({x2: event.offsetX, y2: event.offsetY})
