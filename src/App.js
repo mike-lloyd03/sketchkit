@@ -49,15 +49,17 @@ class App extends React.Component {
   }
 
   handleSVGClick(event) {
+    console.log(event.persist())
+
     const eventX = event.nativeEvent.offsetX
     const eventY = event.nativeEvent.offsetY
     let newElem
 
     this.setState(state => {
       switch(state.activeTool) {
-        // case selectTool:
-        //   selectElement(event)
-        //   break
+        case 'Select':
+          console.log(event)
+          return {activeElement: event.target}
         case 'Vertex':
           newElem = <Vertex key={`vertex${state.elementCount + 1}`} x={eventX} y={eventY} />
           return {
@@ -76,17 +78,17 @@ class App extends React.Component {
             activeElement: newElem,
             activeElementComplete: false
           }
-          case 'Corner Rectangle':
-            newElem = <Rect key={`line${state.elementCount + 1}`}
-              x1={eventX} y1={eventY}
-              onComplete={this.elementComplete}
-              />
-            return {
-              elementCount: state.elementCount + 1,
-              elements: [...state.elements, newElem],
-              activeElement: newElem,
-              activeElementComplete: false
-            }
+        case 'Corner Rectangle':
+          newElem = <Rect key={`line${state.elementCount + 1}`}
+            x1={eventX} y1={eventY}
+            onComplete={this.elementComplete}
+            />
+          return {
+            elementCount: state.elementCount + 1,
+            elements: [...state.elements, newElem],
+            activeElement: newElem,
+            activeElementComplete: false
+          }
         // case centerRectTool:
         //   newRect(event, s, 'center')
         //   break
