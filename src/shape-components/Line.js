@@ -15,13 +15,19 @@ class Line extends Component {
 componentDidMount() {
   $('#svg').click(event => {
     event.stopPropagation()
-    $('svg').off('mousemove')
-    $('svg').off('click')
+    $('#svg').off('mousemove')
+    $('#svg').off('click')
+    this.props.onComplete()
   })
-  $('body').keydown(event => console.log(event.key))
+  // $('body').keydown(event => console.log(event.key))
   $('#svg').mousemove(event => {
     this.setState({x2: event.offsetX, y2: event.offsetY})
   })
+}
+
+componentWillUnmount() {
+  $('#svg').off('mousemove')
+  $('#svg').off('click')
 }
 
   render() {
@@ -43,6 +49,7 @@ componentDidMount() {
 export default Line;
 
 /*
+// ---- Non-React Code ----
 export const newLine = (parentEvent, svg) => {
   // need to add a way to get the coords of a vertex if
   // the user starts drawing a line on that vertex so it
