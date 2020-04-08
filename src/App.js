@@ -4,6 +4,7 @@ import SVG from './shape-components/SVG.js'
 import Tool from './interface-components/Tool.js'
 import Vertex from './shape-components/Vertex.js'
 import Line from './shape-components/Line.js'
+import Rect from './shape-components/Rect.js'
 import './App.css';
 
 class App extends React.Component {
@@ -17,26 +18,29 @@ class App extends React.Component {
       activeElementComplete: false,
      };
     this.setActiveTool = this.setActiveTool.bind(this)
-    this.svgClick = this.svgClick.bind(this)
+    this.handleKeydown = this.handleKeydown.bind(this)
+    this.handleSVGClick = this.handleSVGClick.bind(this)
     this.elementComplete = this.elementComplete.bind(this)
-    this.keydownHandler = this.keydownHandler.bind(this)
 
   }
 
   componentDidMount() {
-    $('body').keydown(event => this.keydownHandler(event))
+    $('body').keydown(event => this.handleKeydown(event))
   }
 
   componentWillUnmount() {
     $('body').off('keydown')
   }
 
-  keydownHandler(event) {
+  handleKeydown(event) {
     // console.log(event.key)
     switch (event.key) {
       case 'Escape':
         if (!this.state.activeElementComplete) {
-          this.setState(state => ({elements: state.elements.filter(element => element !== state.activeElement)}))
+          this.setState(state => ({
+            elements: state.elements.filter(element => element !== state.activeElement), 
+            elementCount: state.elementCount - 1
+          }))
         }
         break
       default:
@@ -44,19 +48,7 @@ class App extends React.Component {
     }
   }
 
-  setActiveTool(tool) {
-    if (tool === this.state.activeTool) {
-      this.setState({activeTool: ''})
-    }
-    else if (tool !== 'Clear') {
-      this.setState({activeTool: tool})
-    }
-    else if (tool === 'Clear') {
-      this.setState({elements: []})
-    }
-  }
-
-  svgClick(event) {
+  handleSVGClick(event) {
     const eventX = event.nativeEvent.offsetX
     const eventY = event.nativeEvent.offsetY
     let newElem
@@ -84,9 +76,17 @@ class App extends React.Component {
             activeElement: newElem,
             activeElementComplete: false
           }
-        // case cornerRectTool:
-        //   newRect(event, s, 'corner')
-        //   break
+          case 'Corner Rectangle':
+            newElem = <Rect key={`line${state.elementCount + 1}`}
+              x1={eventX} y1={eventY}
+              onComplete={this.elementComplete}
+              />
+            return {
+              elementCount: state.elementCount + 1,
+              elements: [...state.elements, newElem],
+              activeElement: newElem,
+              activeElementComplete: false
+            }
         // case centerRectTool:
         //   newRect(event, s, 'center')
         //   break
@@ -96,8 +96,20 @@ class App extends React.Component {
     })
   }
 
+  setActiveTool(tool) {
+    if (tool === this.state.activeTool) {
+      this.setState({activeTool: ''})
+    }
+    else if (tool !== 'Clear') {
+      this.setState({activeTool: tool})
+    }
+    else if (tool === 'Clear') {
+      this.setState({elements: []})
+    }
+  }
+
   elementComplete() {
-    this.setState({ activeElementComplete: false })
+    this.setState({ activeElementComplete: true, activeElement: null })
   }
 
   
@@ -120,7 +132,7 @@ class App extends React.Component {
         <div>
           {toolComponents}
         </div>
-        <SVG width='800' height='400' handleClick={this.svgClick} >
+        <SVG width='800' height='400' handleClick={this.handleSVGClick} >
           {this.state.elements}
         </SVG>      
       </div>

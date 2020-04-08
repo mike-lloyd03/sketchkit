@@ -6,7 +6,6 @@ class Line extends Component {
   constructor(props) {
     super(props);
     this.state = { 
-      complete: false,
       x2: this.props.x1,
       y2: this.props.y1,
      };
@@ -17,9 +16,9 @@ componentDidMount() {
     event.stopPropagation()
     $('#svg').off('mousemove')
     $('#svg').off('click')
-    this.props.onComplete()
+    try {this.props.onComplete()}
+    catch {}
   })
-  // $('body').keydown(event => console.log(event.key))
   $('#svg').mousemove(event => {
     this.setState({x2: event.offsetX, y2: event.offsetY})
   })
