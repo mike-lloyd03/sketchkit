@@ -20,10 +20,35 @@ class Rect extends Component {
       this.props.onComplete()
     })
     $('#svg').mousemove(event => {
-      this.setState({
-        x2: event.offsetX,
-        x3: event.offsetX, y3: event.offsetY,
-        y4: event.offsetY,
+      this.setState((state, props) => {
+        if (props.mode === 'corner') {
+          return {
+            x2: event.offsetX,
+            x3: event.offsetX, y3: event.offsetY,
+            y4: event.offsetY
+          }
+        }
+        else if (props.mode === 'center') {
+          const eventDX = this.props.x1-(event.offsetX-this.props.x1)
+          const eventDY = this.props.y1-(event.offsetY-this.props.y1)
+          return {
+            x1: event.offsetX, y1: eventDY,
+            x2: event.offsetX, y2: event.offsetY,
+            x3: eventDX, y3: event.offsetY,
+            x4: eventDX, y4: eventDY
+          }
+        //   const eventDX = eventX1-(eventX2-eventX1)
+        // const eventDY = eventY1-(eventY2-eventY1)
+
+        // svg.select(`#${rectSides[0]}`).attr({x1: eventDX, y1: eventDY, x2: eventX2, y2: eventDY})
+        // svg.select(`#${rectSides[0]}v`).attr({cx: eventX2, cy: eventDY})
+        // svg.select(`#${rectSides[1]}`).attr({x1: eventX2, y1: eventDY, x2: eventX2, y2: eventY2})
+        // svg.select(`#${rectSides[1]}v`).attr({cx: eventX2, cy: eventY2})
+        // svg.select(`#${rectSides[2]}`).attr({x1: eventX2, y1: eventY2, x2: eventDX, y2: eventY2})
+        // svg.select(`#${rectSides[2]}v`).attr({cx: eventDX, cy: eventY2})
+        // svg.select(`#${rectSides[3]}`).attr({x1: eventDX, y1: eventY2, x2: eventDX, y2: eventDY})
+        // svg.select(`#${rectSides[3]}v`).attr({cx: eventDX, cy: eventDY})
+        }
       })
     })
   }

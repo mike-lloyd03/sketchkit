@@ -82,6 +82,7 @@ class App extends React.Component {
           newElem = <Rect key={`line${state.elementCount + 1}`}
             x1={eventX} y1={eventY}
             onComplete={this.elementComplete}
+            mode='corner'
             />
           return {
             elementCount: state.elementCount + 1,
@@ -89,9 +90,18 @@ class App extends React.Component {
             activeElement: newElem,
             activeElementComplete: false
           }
-        // case centerRectTool:
-        //   newRect(event, s, 'center')
-        //   break
+        case 'Center Rectangle':
+          newElem = <Rect key={`line${state.elementCount + 1}`}
+            x1={eventX} y1={eventY}
+            onComplete={this.elementComplete}
+            mode='center'
+            />
+          return {
+            elementCount: state.elementCount + 1,
+            elements: [...state.elements, newElem],
+            activeElement: newElem,
+            activeElementComplete: false
+          }
         default:
           break
       }
