@@ -1,48 +1,68 @@
-import React, { Component } from 'react'
+import React, {useState, useEffect} from 'react'
 import Vertex from './Vertex.js'
 import $ from 'jquery'
 
-class Line extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { 
-      x2: this.props.x1,
-      y2: this.props.y1,
-     };
+const Line = (props) => {
+  // constructor(props) {
+  //   super(props);
+  //   this.state = { 
+  //     x2: this.props.x1,
+  //     y2: this.props.y1,
+  //    };
+  // }
+  const [x2, setX2] = useState(props.x1)
+  const [y2, setY2] = useState(props.y1)
+
+  // componentDidMount() {
+  //   $('#svg').click(event => {
+  //     event.stopPropagation()
+  //     $('#svg').off('mousemove')
+  //     $('#svg').off('click')
+  //     try {this.props.onComplete()}
+  //     catch {}
+  //   })
+  //   $('#svg').mousemove(event => {
+  //     this.setState({x2: event.offsetX, y2: event.offsetY})
+  //   })
+  // }
+
+  useEffect(() => {
+    $('#svg').click(event => {
+      event.stopPropagation()
+      $('#svg').off('mousemove')
+      $('#svg').off('click')
+      try {props.onComplete()}
+      catch {}
+    })
+    $('#svg').mousemove(event => {
+      setX2(event.offsetX)
+      setY2(event.offsetY)
+    })
+    return () => {
+      $('#svg').off('mousemove')
+      $('#svg').off('click')
   }
+  },[])
 
-componentDidMount() {
-  $('#svg').click(event => {
-    event.stopPropagation()
-    $('#svg').off('mousemove')
-    $('#svg').off('click')
-    try {this.props.onComplete()}
-    catch {}
-  })
-  $('#svg').mousemove(event => {
-    this.setState({x2: event.offsetX, y2: event.offsetY})
-  })
-}
+  // componentWillUnmount() {
+  //   $('#svg').off('mousemove')
+  //   $('#svg').off('click')
+  // }
 
-componentWillUnmount() {
-  $('#svg').off('mousemove')
-  $('#svg').off('click')
-}
-
-  render() {
+  // render() {
     return (
       <g>
-        <Vertex x={this.props.x1} y={this.props.y1} />
+        <Vertex x={props.x1} y={props.y1} />
         <line
-          x1={this.props.x1} y1={this.props.y1}
-          x2={this.state.x2} y2={this.state.y2}
+          x1={props.x1} y1={props.y1}
+          x2={x2} y2={y2}
           stroke='black'
           className='element line'
         />
-        <Vertex x={this.state.x2} y={this.state.y2} />
+        <Vertex x={x2} y={y2} />
       </g>
     );
-  }
+  // }
 }
 
 export default Line;

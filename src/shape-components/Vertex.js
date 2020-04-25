@@ -1,16 +1,10 @@
 /* eslint-disable no-useless-constructor */
-import React, { Component } from 'react'
+import React from 'react'
 
-class Vertex extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
+const Vertex = (props) => {
     return (
-      <circle cx={this.props.x} cy={this.props.y} r="2" className="vertex element" />
+      <circle cx={props.x} cy={props.y} r="2" className="vertex element" />
     );
-  }
 }
 
 export default Vertex;

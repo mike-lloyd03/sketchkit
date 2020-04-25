@@ -1,27 +1,21 @@
 import React from 'react'
 
-class Tool extends React.Component {
-  constructor(props) {
-    super(props)
-    this.clickHandler = this.clickHandler.bind(this)
-  }
+const Tool = (props) => {
 
-clickHandler() {
-    this.props.activeTool(this.props.type)
-  }
+  const clickHandler =() => {
+      props.activeTool(props.type)
+    }
 
-render() {
   return (
     <button
-      id={this.props.type}
-      value={this.props.type}
-      className={this.props.className + (this.props.on ? " on" : '')}
-      onClick={this.clickHandler}
+      id={props.type}
+      value={props.type}
+      className={props.className + (props.on ? " on" : '')}
+      onClick={clickHandler}
     >
-      {this.props.type}
+      {props.type}
     </button>
   )
-}
 }
 
 export default Tool;
