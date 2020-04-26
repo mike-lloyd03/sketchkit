@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import $ from 'jquery'
 import SVG from './shape-components/SVG.js'
 import Tool from './interface-components/Tool.js'
@@ -7,40 +7,21 @@ import Line from './shape-components/Line.js'
 import Rect from './shape-components/Rect.js'
 import './App.css';
 
-class App extends React.Component {
-  constructor() {
-    super();
-    this.state = { 
-      activeTool: '',
-      elements: [],
-      elementCount: 0,
-      activeElement: null,
-      activeElementComplete: false,
-     };
-    this.setActiveTool = this.setActiveTool.bind(this)
-    this.handleKeydown = this.handleKeydown.bind(this)
-    this.handleSVGClick = this.handleSVGClick.bind(this)
-    this.elementComplete = this.elementComplete.bind(this)
+const App = () => {
+  const [activeTool, setActiveTool] = useState('')
+  const [elements, setElements] = useState([])
+  const [elementCount, setElementCount] = useState(0)
+  const [activeElement, setActiveElement] = useState(null)
 
-  }
-
-  componentDidMount() {
-    $('body').keydown(event => this.handleKeydown(event))
-  }
-
-  componentWillUnmount() {
-    $('body').off('keydown')
-  }
-
-  handleKeydown(event) {
-    // console.log(event.key)
+  
+  const handleKeydown = (event) => {
     switch (event.key) {
       case 'Escape':
-        if (!this.state.activeElementComplete) {
-          this.setState(state => ({
-            elements: state.elements.filter(element => element !== state.activeElement), 
-            elementCount: state.elementCount - 1
-          }))
+        if (activeElement) {
+          console.log('escape')
+          setElements(prevElements => prevElements.filter(element => element !== activeElement))
+          setElementCount(prevElementCount => prevElementCount - 1)
+          elementComplete()
         }
         break
       default:
@@ -48,108 +29,106 @@ class App extends React.Component {
     }
   }
 
-  handleSVGClick(event) {
-    console.log(event.persist())
+  useEffect(() => {
+    $('body').keydown(event => handleKeydown(event))
+    return () => {
+      $('body').off('keydown')
+    }
+  }, [activeElement])
 
+  const handleSVGClick =(event) => {
     const eventX = event.nativeEvent.offsetX
     const eventY = event.nativeEvent.offsetY
     let newElem
 
-    this.setState(state => {
-      switch(state.activeTool) {
-        case 'Select':
-          console.log(event)
-          return {activeElement: event.target}
-        case 'Vertex':
-          newElem = <Vertex key={`vertex${state.elementCount + 1}`} x={eventX} y={eventY} />
-          return {
-            elements: [...state.elements, newElem],
-            elementCount: state.elementCount + 1,
-            activeElement: newElem
-          }
-        case 'Line':
-          newElem = <Line key={`line${state.elementCount + 1}`}
-            x1={eventX} y1={eventY}
-            onComplete={this.elementComplete}
-            />
-          return {
-            elementCount: state.elementCount + 1,
-            elements: [...state.elements, newElem],
-            activeElement: newElem,
-            activeElementComplete: false
-          }
-        case 'Corner Rectangle':
-          newElem = <Rect key={`line${state.elementCount + 1}`}
-            x1={eventX} y1={eventY}
-            onComplete={this.elementComplete}
-            mode='corner'
-            />
-          return {
-            elementCount: state.elementCount + 1,
-            elements: [...state.elements, newElem],
-            activeElement: newElem,
-            activeElementComplete: false
-          }
-        case 'Center Rectangle':
-          newElem = <Rect key={`line${state.elementCount + 1}`}
-            x1={eventX} y1={eventY}
-            onComplete={this.elementComplete}
-            mode='center'
-            />
-          return {
-            elementCount: state.elementCount + 1,
-            elements: [...state.elements, newElem],
-            activeElement: newElem,
-            activeElementComplete: false
-          }
-        default:
-          break
-      }
-    })
+    switch(activeTool) {
+      case 'Select':
+        console.log(event)
+        setActiveElement(event.target)
+        break
+
+      case 'Vertex':
+        newElem = <Vertex key={`vertex${elementCount + 1}`} x={eventX} y={eventY} />
+        setElements(prevElements => [...prevElements, newElem])
+        setElementCount(prevElementCount => prevElementCount + 1)
+        setActiveElement(newElem)
+        break
+
+      case 'Line':
+        newElem = <Line key={`line${elementCount + 1}`}
+          x1={eventX} y1={eventY}
+          onComplete={elementComplete}
+          />
+        setElements(prevElements => [...prevElements, newElem])
+        setElementCount(prevElementCount => prevElementCount + 1)
+        setActiveElement(newElem)
+        break
+
+      case 'Corner Rectangle':
+        newElem = <Rect key={`rect${elementCount + 1}`}
+          x1={eventX} y1={eventY}
+          onComplete={elementComplete}
+          mode='corner'
+          />
+        setElements(prevElements => [...prevElements, newElem])
+        setElementCount(prevElementCount => prevElementCount + 1)
+        setActiveElement(newElem)
+        break
+
+      case 'Center Rectangle':
+        newElem = <Rect key={`rect${elementCount + 1}`}
+          x1={eventX} y1={eventY}
+          onComplete={elementComplete}
+          mode='center'
+          />
+        setElements(prevElements => [...prevElements, newElem])
+        setElementCount(prevElementCount => prevElementCount + 1)
+        setActiveElement(newElem)
+        break
+
+      default:
+        break
+    }
   }
 
-  setActiveTool(tool) {
-    if (tool === this.state.activeTool) {
-      this.setState({activeTool: ''})
+  const handleActiveTool =(tool) => {
+    if (tool === activeTool) {
+      setActiveTool('')
     }
     else if (tool !== 'Clear') {
-      this.setState({activeTool: tool})
+      setActiveTool(tool)
     }
     else if (tool === 'Clear') {
-      this.setState({elements: []})
+      setElements([])
     }
   }
 
-  elementComplete() {
-    this.setState({ activeElementComplete: true, activeElement: null })
+  const elementComplete = () => {
+    setActiveElement(null)
   }
 
-  
+  // Setup the tool buttons
+  const toolList = ['Select', 'Vertex', 'Line', 'Corner Rectangle', 'Center Rectangle', 'Clear']
+  const toolComponents = toolList.map(a =>
+    <Tool
+      key={`button${a.split(' ').join('')}`}
+      type={a}
+      className='button'
+      on={a === activeTool}
+      activeTool={handleActiveTool}
+    />
+  )
 
-  render() {
-    // Setup the tool buttons
-    const toolList = ['Select', 'Vertex', 'Line', 'Corner Rectangle', 'Center Rectangle', 'Clear']
-    let toolComponents = toolList.map(a =>
-      <Tool
-        key={`button${a.split(' ').join('')}`}
-        type={a}
-        className='button'
-        on={a === this.state.activeTool}
-        activeTool={this.setActiveTool}
-      />
-    )
-
-    return (
+  return (
+    <div>
       <div>
-        <div>
-          {toolComponents}
-        </div>
-        <SVG width='800' height='400' handleClick={this.handleSVGClick} >
-          {this.state.elements}
-        </SVG>      
+        {toolComponents}
       </div>
-    );
-  }
+      <SVG width='800' height='400' handleClick={handleSVGClick} >
+        {elements}
+      </SVG>      
+    </div>
+  );
 }
 
 export default App;
