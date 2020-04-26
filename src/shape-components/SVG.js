@@ -6,7 +6,6 @@ const SVG = (props) => {
       width={props.width}
       height={props.height}
       onClick={props.handleClick}
-      // onMouseMove={props.handleMouseMove}
       id='svg'
     >
       {props.children}
